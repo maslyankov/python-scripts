@@ -1,4 +1,6 @@
 # Script splits all the images in specified folder in two.
+# Uses Pillow module
+
 from PIL import Image
 from pip._vendor.distlib.compat import raw_input
 import os
