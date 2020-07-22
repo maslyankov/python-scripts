@@ -11,6 +11,10 @@ import logging, os, glob
 # Constants
 ADDIT_SUFFIX_PARAMS = 3
 
+# Globals
+cases_cont_from = 0
+files_last_list_len = 0
+
 # Sorting Functions
 def find_first_digit(s, non=False):
     for i, x in enumerate(s):
@@ -36,23 +40,40 @@ def natural_key(s, *args, **kwargs):
 
 # Function to go through the passed folder's subfolders
 def go_through_subfolders(basepath):
+    global cases_cont_from, files_last_list_len
     # TODO:
     # 1 Add functionality that checks subfolder names and takes that into account for case numbers
 
     child_dirs = glob.glob(os.path.join(basepath, "*", ""))
     print(child_dirs)
 
+
     for count, folder in enumerate(child_dirs):
         print("\nNow at fld:" + folder)
 
         # Go through the subfolders
         childs_child_dirs = glob.glob(os.path.join(folder, "*", ""))
+        childs_child_dirs_count = len(child_dirs)
+
+        print(cases_cont_from)
+
+        print(files_last_list_len)
+
+        if childs_child_dirs_count == count+1:
+            print("Last subfolder!")
+            cases_cont_from = files_last_list_len
+
         print(">>" + str(childs_child_dirs))
-        # rename_files_in_dir(folder)
+
+        # Iterate through subfolders
+        for count_childs, folder_child in enumerate(childs_child_dirs):
+            rename_files_in_dir(folder_child)
 
 
 # Function to rename multiple files
 def rename_files_in_dir(basepath):
+    global cases_cont_from, files_last_list_len
+
     basepath += os.path.sep
 
     logfile = basepath + 'LogFile' + '.txt' #TODO - Add folder name to log file name
@@ -79,12 +100,15 @@ def rename_files_in_dir(basepath):
     files_list = sorted(glob.glob(basepath + '*.jpg'), key = natural_key, reverse = False if order == "asc" else True)
     logging.info("Files List: \n" + str(files_list) + "\n")
 
-    if len(files_list) != (len(SuffixesList)-ADDIT_SUFFIX_PARAMS):
+    files_count = len(files_list)
+    files_last_list_len = files_count
+
+    if files_count != (len(SuffixesList)-ADDIT_SUFFIX_PARAMS):
         # Handle file/arguments inconsistencies
         print('Not enough files or suffixes!')
-        print("Files:", len(files_list))
+        print("Files:", files_count)
         print("Suffixes:", len(SuffixesList)-ADDIT_SUFFIX_PARAMS)
-        logging.error("Files:" + str(len(files_list)) + " | " + "Suffixes:" + str(len(SuffixesList)-ADDIT_SUFFIX_PARAMS) + "\n")
+        logging.error("Files:" + str(files_count) + " | " + "Suffixes:" + str(len(SuffixesList)-ADDIT_SUFFIX_PARAMS) + "\n")
         return
 
     # Add prefix delimiter if not empty
@@ -96,7 +120,7 @@ def rename_files_in_dir(basepath):
     # Iterate through the files in the dir
     for count, filename in enumerate(files_list):
         if SuffixesList[0].strip() == "cases":
-            prefix = "case" + str(count+1)
+            prefix = "case" + str(cases_cont_from + count + 1)
 
         dst = basepath + prefix + prefix_delim + SuffixesList[count+ADDIT_SUFFIX_PARAMS].strip() + ".jpg"
         src = filename
@@ -120,7 +144,7 @@ def main():
     go_through_subfolders(path)
 
     # TODO:
-    # 2 Move them files to one folder afterwards
+    # - Move them files to one folder afterwards
 
 if __name__ == '__main__':
     # Calling main() function
