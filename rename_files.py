@@ -1,5 +1,9 @@
-# Pythono3 code to rename multiple
-# files in a directory or folder
+# Python 3 code to rename multiple
+# files in a directory or folder's subdirectories
+# Script uses arguments files located at each subdir - suffixes.txt
+# Arg files should contain suffixes seperated by new line
+# First line of arg files - "cases" will rename images with caseN name base, otherwise if for ex first line is "gosho" will rename files to gosho_...
+# Second line (argument) specifies if we should start parsing files in ASCending (asc) or DESCending order (desc). 
 
 # importing modules
 import logging, os, glob
