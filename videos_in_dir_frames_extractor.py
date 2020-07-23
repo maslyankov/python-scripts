@@ -26,12 +26,14 @@ def split_digits(s, case=False):
 def natural_key(s, *args, **kwargs):
     return tuple(split_digits(s, *args, **kwargs))
 
-def extract_frames(file_name, starting_seconds, frames_range):
+def extract_frames(file_name, starting_seconds, frames_range, save_path):
 
     print('File name :', file_name)
     print('Seconds to start dumping :', starting_seconds)
     print('Range of dumped frames :', frames_range)
     #########################################################################################################
+    print(file_name)
+
     video = cv2.VideoCapture(file_name);
 
     # Find OpenCV version
@@ -44,10 +46,9 @@ def extract_frames(file_name, starting_seconds, frames_range):
 
     video.release()
     ##########################################################################################################
-    now = datetime.datetime.now()
-    folder = now.strftime("%Y_%m_%d_%H-%M-%S")
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
 
     vidcap = cv2.VideoCapture(file_name)
     count = 0
@@ -57,12 +58,14 @@ def extract_frames(file_name, starting_seconds, frames_range):
             break
         if ((fps * float(starting_seconds)) < count) and (
                 (fps * float(starting_seconds) + float(frames_range)) > count):
-            cv2.imwrite(os.path.join(folder, "frame{:d}.jpg".format(count)), image)
+            cv2.imwrite(  os.path.join( save_path , file_name + "frame{:d}.jpg".format(count) ), image  )
+            print("img file: "+os.path.join( save_path , file_name + "frame{:d}.jpg".format(count) ))
         count += 1
-    print("farames", count)
+    print("frames", count)
 
 def main(argv):
-    basepath = './'
+    basepath = '.' + os.path.sep
+    savepath = basepath + 'frames' + os.path.sep
     starting_seconds0 = ''
     frames_range0 = ''
 
@@ -80,9 +83,9 @@ def main(argv):
             print('python <test.py> -s<starting_seconds> -f<frames_range> -d<dir (default ./)>')
             sys.exit()
         elif opt in ("-s", "--startingseconds"):
-            starting_seconds = arg
+            starting_seconds0 = arg
         elif opt in ("-f", "--framesrange"):
-            frames_range = arg
+            frames_range0 = arg
         elif opt in ("-d", "--dir"):
             basepath = arg
 
@@ -90,8 +93,7 @@ def main(argv):
     files_list = sorted(glob.glob(basepath + '*.mp4'), key=natural_key, reverse=False)
     
     for count, filename in enumerate(files_list):
-        extract_frames(filename, starting_seconds0, frames_range0)
+        extract_frames( os.path.splitext(filename)[0], starting_seconds0, frames_range0, savepath)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
-
