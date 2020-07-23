@@ -3,7 +3,7 @@
 # Script uses arguments files located at each subdir - suffixes.txt
 # Arg files should contain suffixes seperated by new line
 # First line of arg files - "cases" will rename images with caseN name base, otherwise if for ex first line is "gosho" will rename files to gosho_...
-# Second line (argument) specifies if we should start parsing files in ASCending (asc) or DESCending order (desc). 
+# Second line (argument) specifies if we should start parsing files in ASCending (asc) or DESCending order (desc).
 
 # importing modules
 import logging, os, glob
@@ -75,8 +75,14 @@ def rename_files_in_dir(basepath):
     global cases_cont_from, files_last_list_len
 
     basepath += os.path.sep
+    parentdir = os.path.dirname(os.path.dirname(basepath)) + os.path.sep
+    logging.info("Parent Dir: \n" + str(parentdir) + "\n")
 
-    logfile = basepath + 'LogFile' + '.txt' #TODO - Add folder name to log file name
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+
+    logfile = os.path.dirname(parentdir) + os.path.sep + 'LogFile.txt' #TODO - Add folder name to log file name
+    print("Log File:" + logfile)
     logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(asctime)s %(message)s')
 
     logging.info('-----------------------------')
@@ -101,7 +107,7 @@ def rename_files_in_dir(basepath):
     logging.info("Files List: \n" + str(files_list) + "\n")
 
     files_count = len(files_list)
-    files_last_list_len = files_count
+    files_last_list_len = files_count if prefix == "cases" else 0
 
     if files_count != (len(SuffixesList)-ADDIT_SUFFIX_PARAMS):
         # Handle file/arguments inconsistencies
@@ -122,7 +128,7 @@ def rename_files_in_dir(basepath):
         if SuffixesList[0].strip() == "cases":
             prefix = "case" + str(cases_cont_from + count + 1)
 
-        dst = basepath + prefix + prefix_delim + SuffixesList[count+ADDIT_SUFFIX_PARAMS].strip() + ".jpg"
+        dst = parentdir + prefix + prefix_delim + SuffixesList[count+ADDIT_SUFFIX_PARAMS].strip() + ".jpg"
         src = filename
 
         # rename() function will
