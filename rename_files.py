@@ -128,7 +128,7 @@ def rename_files_in_dir(basepath):
         if SuffixesList[0].strip() == "cases":
             prefix = "case" + str(cases_cont_from + count + 1)
 
-        dst = parentdir + prefix + prefix_delim + SuffixesList[count+ADDIT_SUFFIX_PARAMS].strip() + ".jpg"
+        dst = parentdir + prefix + prefix_delim + SuffixesList[count+ADDIT_SUFFIX_PARAMS].strip() + prefix_delim + os.path.basename(os.path.dirname(basepath)) +  ".jpg"
         src = filename
 
         # rename() function will
